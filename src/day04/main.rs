@@ -18,16 +18,23 @@ fn validate_no_decrease(input: i64) -> bool {
 }
 
 fn validate_double_number(input: i64) -> bool {
-    let mut rest = input / 10;
-    let mut prevdigit = input % 10;
+    let mut rest = input;
 
     while rest > 0 {
         let digit = rest % 10;
-        if digit == prevdigit {
+        let double = digit * 11;
+        let triple = digit * 111;
+        if (rest % 1000) == triple {
+            // when we confirmed the digit appears at least 3 times in a row, we skip over all the instance of this digit
+            while (rest % 10) == digit {
+                rest = rest / 10;
+            }
+            continue;
+        }
+        if (rest % 100) == double {
             return true;
         }
 
-        prevdigit = digit;
         rest = rest / 10;
     }
 
@@ -71,7 +78,14 @@ fn test_validate() {
     assert!(validate_no_decrease(135679));
     assert!(validate_no_decrease(111123));
 
-    assert!(validate(111111));
+    assert!(validate_double_number(123455));
+    assert_eq!(false, validate_double_number(123555));
+    assert!(validate_double_number(113333));
+
     assert_eq!(false, validate(223450));
     assert_eq!(false, validate(123789));
+
+    assert!(validate(112233));
+    assert_eq!(false, validate(123444));
+    assert!(validate(111122));
 }
